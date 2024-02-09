@@ -85,7 +85,7 @@ func main() {
         }
     }(a)
 
-	// go deployTx(public_key, a)
+	go deployTx(public_key, a)
 	go invokeTx(a)
 	select {}
 
