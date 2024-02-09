@@ -71,13 +71,64 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+	go func(a *account.Account) {
+        for {
+            tx, err := declareTx(a)
+            if err != nil {
+                fmt.Println(err.Error())
+                time.Sleep(time.Second * 40) 
+                continue
+            }
+
+            fmt.Printf("Transaction: %+v\n", tx)
+            time.Sleep(time.Second * 20) 
+        }
+    }(a)
 
 	go deployTx(public_key, a)
 	go invokeTx(a)
 	select {}
 
 }
+func declareTx(a *account.Account) (*rpc.InvokeTxnV1, error) {
+    nonce, err := a.Nonce(context.Background(), rpc.BlockID{Tag: "latest"}, a.AccountAddress)
+    if err != nil {
+        return nil, err
+    }
 
+    ca, err := utils.HexToFelt(ethContract)
+    if err != nil {
+        return nil, err
+    }
+    recipient, err := utils.HexToFelt("0x054649B7bF9e490E7098265895af70E6fB7DD7e6610E605f9eC27C8afE8b343b")
+    if err != nil {
+        return nil, err
+    }
+
+    amount := utils.BigIntToFelt(big.NewInt(1))
+    maxfee := utils.BigIntToFelt(big.NewInt(10000))
+
+    InvokeTx := rpc.InvokeTxnV1{
+        MaxFee:        maxfee,
+        Version:       rpc.TransactionV1,
+        Nonce:         nonce,
+        Type:          rpc.TransactionType_Invoke,
+        SenderAddress: a.AccountAddress,
+    }
+
+    FnCall := rpc.FunctionCall{
+        ContractAddress:    ca,
+        EntryPointSelector: utils.GetSelectorFromNameFelt(contractMethod),
+        Calldata:           []*felt.Felt{recipient, amount},
+    }
+
+    InvokeTx.Calldata, err = a.FmtCalldata([]rpc.FunctionCall{FnCall})
+    if err != nil {
+        return nil, err
+    }
+
+    return &InvokeTx, nil
+}
 func deployTx(pub string, a *account.Account) {
 	classHash, err := utils.HexToFelt(predeployedClassHash)
 	if err != nil {
