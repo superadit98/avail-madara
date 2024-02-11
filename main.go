@@ -71,13 +71,12 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-
+	
 	go deployTx(public_key, a)
 	go invokeTx(a)
 	select {}
 
 }
-
 
 func deployTx(pub string, a *account.Account) {
 	classHash, err := utils.HexToFelt(predeployedClassHash)
@@ -114,7 +113,7 @@ func deployTx(pub string, a *account.Account) {
 			continue
 		}
 		fmt.Println("deployd: ", resp.ContractAddress)
-		time.Sleep(31 * time.Second)
+		time.Sleep(41 * time.Second)
 
 	}
 
@@ -171,7 +170,7 @@ func invokeTx(a *account.Account) {
 		}
 
 		fmt.Println("tx: ", rsp.TransactionHash, " nonce: ", nonce)
-		time.Sleep(30 * time.Second)
+		time.Sleep(40 * time.Second)
 	}
 }
 
