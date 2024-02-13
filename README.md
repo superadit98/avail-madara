@@ -58,7 +58,3 @@ This Go program interacts with a StarkNet testnet through RPC calls to deploy an
     ```
 
 3. Detach from the screen session by pressing `Ctrl + A` followed by `D`. This will leave the program running in the background.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
